@@ -1,0 +1,13 @@
+Agentic RAG with multiple tool calling 
+1. Tavily Web Search ✅
+2. Arxiv 
+
++ Multimodal 
+Extract the table 
+images 
+graph and plot 
+
+
++ Hybrid Search Rag
+Reranking 
+Hybrid Search multi docs 
