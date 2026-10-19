@@ -1,6 +1,8 @@
 Agentic RAG with multiple tool calling 
 1. Tavily Web Search ✅
-2. Arxiv 
+2. Arxiv ✅
+
+Need to optimized 
 
 + Multimodal 
 Extract the table 
