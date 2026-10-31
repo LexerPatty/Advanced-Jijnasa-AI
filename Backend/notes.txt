@@ -1,0 +1,31 @@
+Agentic RAG with multiple tool calling 
+1. Tavily Web Search ✅
+2. Arxiv ✅
+
+Need to optimized 
+
++ Multimodal 
+Extract the table ✅
+images ✅
+graph and plot ✅
+
+need to extractthe page number along with the retrieve
+need to optimized more 
+
+result = ask_agent(
+    """
+    Give me a short FY2026 performance summary.
+    Include:
+    1. total revenue,
+    2. fastest-growing region,
+    3. support-resolution improvement,
+    4. solar share at the Penang facility.
+    """
+)
+
+unable to give answer 
+
+
++ Hybrid Search Rag
+Reranking 
+Hybrid Search multi docs 
