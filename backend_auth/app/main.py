@@ -43,3 +43,22 @@ async def root():
 
 
 
+
+# if __name__ == "__main__":
+#     import atexit
+#     import subprocess
+#     import time
+#     import uvicorn
+
+#     backend = subprocess.Popen(
+#         [sys.executable, "-m", "uvicorn", "main:app", "--port", "8001"],
+#         cwd=r"P:\Advanced-Jijnasa-AI\Backend",
+#     )
+#     atexit.register(backend.terminate)
+
+#     time.sleep(3)
+#     if backend.poll() is not None:
+#         print(f"!!! Backend exited with code {backend.returncode}. Check the error above.")
+
+#     uvicorn.run("app.main:app", host="127.0.0.1", port=8000, reload=True)
+

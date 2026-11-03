@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -15,8 +15,6 @@ import {
   FileImage,
   FileType,
   FileCode,
-  FileCheck,
-  Files,
   Scissors,
   Layers,
   Trash2,
@@ -33,16 +31,14 @@ import {
   LockKeyhole,
   UnlockKeyhole,
   WandSparkles,
-  Stars,
   Zap,
-  Cloud,
   ShieldCheck,
-  BookOpen,
-  Smile,
   FileCode2,
 } from "lucide-react";
 
 import logo from "../assets/logo_icon.png";
+
+import docsBucket from "../assets/docs_bucket.png";
 
 // --------------------------------------------------
 // CATEGORY FILTERS
@@ -348,11 +344,51 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   const [activeCategory, setActiveCategory] = useState("all");
+  const [loadingTool, setLoadingTool] = useState(null);
+
+  // Cleanup navigation timer if the dashboard unmounts.
+  const [navigationTimer, setNavigationTimer] = useState(null);
+
+  useEffect(() => {
+    return () => {
+      if (navigationTimer) {
+        clearTimeout(navigationTimer);
+      }
+    };
+  }, [navigationTimer]);
+
+  // --------------------------------------------------
+  // TOOL CLICK WITH SPIRAL LOADING
+  // --------------------------------------------------
+
+  const handleToolClick = (tool) => {
+    if (loadingTool) return;
+
+    setLoadingTool(tool);
+
+    const timer = setTimeout(() => {
+      navigate(tool.route);
+    }, 1800);
+
+    setNavigationTimer(timer);
+  };
+
+  // --------------------------------------------------
+  // LOGOUT
+  // --------------------------------------------------
 
   const handleLogout = () => {
+    if (navigationTimer) {
+      clearTimeout(navigationTimer);
+    }
+
     logout();
     navigate("/login");
   };
+
+  // --------------------------------------------------
+  // CATEGORY FILTER
+  // --------------------------------------------------
 
   const visibleSections =
     activeCategory === "all"
@@ -364,6 +400,191 @@ export default function Dashboard() {
     0
   );
 
+  // --------------------------------------------------
+  // LOADING SCREEN
+  // --------------------------------------------------
+
+  if (loadingTool) {
+    return (
+      <main className="fixed inset-0 z-[9999] flex min-h-screen items-center justify-center overflow-hidden bg-[#f8faff] text-slate-900">
+
+        {/* Background decorations */}
+
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -right-40 -top-40 h-96 w-96 rounded-full bg-blue-200/40 blur-3xl" />
+          <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-purple-200/40 blur-3xl" />
+          <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pink-100/30 blur-3xl" />
+        </div>
+
+        {/* Loading Content */}
+
+        <div className="relative z-10 flex flex-col items-center px-6 text-center">
+
+          {/* Spiral Animation */}
+
+          <div className="relative flex h-48 w-48 items-center justify-center sm:h-56 sm:w-56">
+
+            {/* Outer glow */}
+
+            <div className="absolute inset-0 animate-pulse rounded-full bg-blue-400/10 blur-2xl" />
+
+            {/* Rotating spiral SVG */}
+
+            <svg
+              viewBox="0 0 200 200"
+              className="absolute inset-0 h-full w-full animate-[spiralRotate_2.5s_linear_infinite]"
+              fill="none"
+            >
+              <defs>
+                <linearGradient
+                  id="spiralGradient"
+                  x1="0"
+                  y1="0"
+                  x2="200"
+                  y2="200"
+                  gradientUnits="userSpaceOnUse"
+                >
+                  <stop offset="0%" stopColor="#60A5FA" />
+                  <stop offset="35%" stopColor="#6366F1" />
+                  <stop offset="70%" stopColor="#A855F7" />
+                  <stop offset="100%" stopColor="#EC4899" />
+                </linearGradient>
+              </defs>
+
+              {/* Spiral path */}
+
+              <path
+                d="M100 100
+                   C100 92 108 92 108 100
+                   C108 116 84 116 84 100
+                   C84 76 124 76 124 100
+                   C124 132 68 132 68 100
+                   C68 60 140 60 140 100
+                   C140 148 52 148 52 100
+                   C52 44 156 44 156 100
+                   C156 164 36 164 36 100
+                   C36 28 172 28 172 100
+                   C172 180 20 180 20 100"
+                stroke="url(#spiralGradient)"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+
+              {/* Circular orbit */}
+
+              <circle
+                cx="100"
+                cy="100"
+                r="88"
+                stroke="#CBD5E1"
+                strokeWidth="1"
+                strokeDasharray="4 8"
+                opacity="0.5"
+              />
+            </svg>
+
+            {/* Center Logo */}
+
+            <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-2xl sm:h-20 sm:w-20">
+
+              <img
+                src={logo}
+                alt="NothiLipi AI"
+                className="h-full w-full object-contain p-3"
+              />
+
+            </div>
+
+            {/* Orbiting dot */}
+
+            <div className="absolute inset-0 animate-[orbit_2s_linear_infinite]">
+              <div className="absolute left-1/2 top-0 h-4 w-4 -translate-x-1/2 rounded-full border-2 border-white bg-blue-600 shadow-lg shadow-blue-300" />
+            </div>
+
+          </div>
+
+          {/* Loading Text */}
+
+          <div className="mt-8">
+
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white/80 px-4 py-2 text-xs font-bold tracking-widest text-indigo-600 shadow-sm backdrop-blur-sm">
+
+              <Sparkles size={14} className="animate-pulse" />
+
+              NOTHILIPI.AI
+
+            </div>
+
+            <h2 className="special_heading text-2xl font-extrabold tracking-tight text-slate-800 sm:text-3xl">
+
+              Opening {loadingTool.title}
+
+            </h2>
+
+            <p className="mt-3 text-sm font-medium tracking-wide text-slate-500">
+
+              Preparing your workspace...
+
+            </p>
+
+          </div>
+
+          {/* Loading Dots */}
+
+          <div className="mt-6 flex items-center gap-2">
+
+            <span className="h-2 w-2 animate-[loadingDot_1s_ease-in-out_infinite] rounded-full bg-blue-500" />
+
+            <span className="h-2 w-2 animate-[loadingDot_1s_ease-in-out_0.2s_infinite] rounded-full bg-indigo-500" />
+
+            <span className="h-2 w-2 animate-[loadingDot_1s_ease-in-out_0.4s_infinite] rounded-full bg-purple-500" />
+
+          </div>
+
+        </div>
+
+        {/* Loading Screen Animations */}
+
+        <style>{`
+          @keyframes spiralRotate {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(360deg);
+            }
+          }
+
+          @keyframes orbit {
+            from {
+              transform: rotate(0deg);
+            }
+            to {
+              transform: rotate(360deg);
+            }
+          }
+
+          @keyframes loadingDot {
+            0%, 100% {
+              transform: translateY(0);
+              opacity: 0.4;
+            }
+            50% {
+              transform: translateY(-6px);
+              opacity: 1;
+            }
+          }
+        `}</style>
+
+      </main>
+    );
+  }
+
+  // --------------------------------------------------
+  // DASHBOARD UI
+  // --------------------------------------------------
+
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f8faff] text-slate-900">
 
@@ -372,7 +593,7 @@ export default function Dashboard() {
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -right-40 -top-40 h-96 w-96 rounded-full bg-blue-200/30 blur-3xl" />
         <div className="absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-purple-200/30 blur-3xl" />
-        <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-pink-100/20 blur-3xl" />
+        <div className="absolute left-1/2 top-1/2 h-96 w-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-pink-100/20 blur-3xl" />
       </div>
 
       <div className="relative mx-auto max-w-[1800px] px-5 py-6 sm:px-8 lg:px-10">
@@ -425,7 +646,7 @@ export default function Dashboard() {
             <button
               onClick={handleLogout}
               title="Logout"
-              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-red-200 hover:bg-red-50 hover:text-red-600 sm:px-4 cursor-pointer"
+              className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-red-200 hover:bg-red-50 hover:text-red-600 sm:px-4"
             >
               <LogOut size={17} />
               <span className="hidden sm:block">Logout</span>
@@ -435,62 +656,106 @@ export default function Dashboard() {
 
         </header>
 
-        {/* HERO SECTION */}
 
-        <section className="relative mb-10 overflow-hidden rounded-[28px] bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 p-7 text-white shadow-xl shadow-blue-200/40 sm:p-10">
 
-          <div className="pointer-events-none absolute -right-10 -top-16 text-[180px] opacity-10">
-            📄
-          </div>
 
-          <div className="pointer-events-none absolute bottom-0 right-48 text-6xl opacity-20">
-            ✨
-          </div>
 
-          <div className="relative z-10 max-w-2xl">
 
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-2 text-xs font-bold tracking-wider backdrop-blur-sm">
-              <Sparkles size={15} />
-              YOUR ALL-IN-ONE PDF PLAYGROUND
-            </div>
+        
 
-            <h2 className="text-4xl font-bold tracking-tight sm:text-5xl special_heading">
-              Hello, {((user?.name || "there").split(" ")[0])}! 👋
-            </h2>
+        {/* HERO SECTION............................................... */}
 
-            <p className="mt-4 max-w-xl text-sm leading-7 text-blue-50 sm:text-base tracking-[0.03em]">
-              Ready to make your documents smarter? Convert, organize,
-              protect and explore your PDFs with powerful AI tools.
-            </p>
+        
+{/* HERO SECTION */}
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+<section className="relative mb-10 mt-4 min-h-[60px] rounded-[28px] bg-gradient-to-r from-blue-50 via-indigo-300 to-violet-600 p-7 text-white shadow-xl shadow-blue-200/40 sm:mt-8 sm:min-h-[60px] sm:p-10 lg:mt-10 lg:min-h-[60px]">
 
-              <div className="flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2.5 backdrop-blur-sm">
-                <FileText size={17} />
-                <span className="text-sm font-semibold">
-                  {totalTools} PDF Tools
-                </span>
-              </div>
+  {/* Background Decorations (clipped inside the card only) */}
 
-              <div className="flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2.5 backdrop-blur-sm">
-                <Zap size={17} />
-                <span className="text-sm font-semibold">
-                  AI Powered
-                </span>
-              </div>
+  <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[28px]">
+    <div className="absolute -right-10 -top-16 text-[180px] opacity-10">
+      📄
+    </div>
 
-              <div className="flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2.5 backdrop-blur-sm">
-                <ShieldCheck size={17} />
-                <span className="text-sm font-semibold">
-                  Secure Workspace
-                </span>
-              </div>
+    <div className="absolute bottom-0 right-48 text-6xl opacity-20">
+      ✨
+    </div>
 
-            </div>
+    <div className="absolute right-[35%] top-10 h-64 w-64 rounded-full bg-white/5 blur-3xl" />
+  </div>
 
-          </div>
+  {/* Hero Text Content */}
 
-        </section>
+  <div className="relative z-10 max-w-2xl lg:max-w-[58%]">
+
+    {/* Badge */}
+
+    <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-2 text-xs font-bold tracking-wider backdrop-blur-sm">
+      <Sparkles size={15} />
+      YOUR ALL-IN-ONE PDF PLAYGROUND
+    </div>
+
+    {/* Greeting */}
+
+    <h2 className="special_heading text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+      Hello, {((user?.name || "there").split(" ")[0])}! 👋
+    </h2>
+
+    {/* Description */}
+
+    <p className="mt-4 max-w-xl text-sm leading-7 tracking-[0.03em] text-blue-50 sm:text-base">
+      Ready to make your documents smarter? Convert, organize,
+      protect and explore your PDFs with powerful AI tools.
+    </p>
+
+    {/* Features */}
+
+    <div className="mt-6 flex flex-wrap items-center gap-3">
+
+      <div className="flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2.5 backdrop-blur-sm">
+        <FileText size={17} />
+        <span className="text-sm font-semibold">{totalTools} PDF Tools</span>
+      </div>
+
+      <div className="flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2.5 backdrop-blur-sm">
+        <Zap size={17} />
+        <span className="text-sm font-semibold">AI Powered</span>
+      </div>
+
+      <div className="flex items-center gap-2 rounded-xl bg-white/15 px-4 py-2.5 backdrop-blur-sm">
+        <ShieldCheck size={17} />
+        <span className="text-sm font-semibold">Secure Workspace</span>
+      </div>
+
+    </div>
+
+  </div>
+
+  {/* DOCS BUCKET IMAGE (bigger, overflowing the top of the hero) */}
+
+  <div className="pointer-events-none absolute -bottom-20 right-0 z-20 sm:right-2 lg:right-8">
+
+    <img
+      src={docsBucket}
+      alt="Docs Bucket - PDF document workspace"
+      className="h-[400px] w-[400px] object-contain drop-shadow-2xl sm:h-[460px] sm:w-[460px] lg:h-[620px] lg:w-[620px] xl:h-[680px] xl:w-[680px]"
+    />
+
+  </div>
+
+</section>
+
+
+
+
+
+
+
+
+
+
+
+
 
         {/* CATEGORY FILTER */}
 
@@ -499,7 +764,7 @@ export default function Dashboard() {
           <div className="mb-5 flex items-center justify-between gap-3">
 
             <div>
-              <h3 className="text-xl font-bold tracking-tight text-slate-800 special_heading sm:text-2xl">
+              <h3 className="special_heading text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">
                 Explore PDF Tools
               </h3>
 
@@ -580,7 +845,7 @@ export default function Dashboard() {
 
                   <div>
 
-                    <h3 className="text-xl font-bold tracking-tight text-slate-800 special_heading sm:text-2xl">
+                    <h3 className="special_heading text-xl font-bold tracking-tight text-slate-800 sm:text-2xl">
                       {section.title}
                     </h3>
 
@@ -610,7 +875,7 @@ export default function Dashboard() {
                     <button
                       key={tool.title}
                       type="button"
-                      onClick={() => navigate(tool.route)}
+                      onClick={() => handleToolClick(tool)}
                       style={{
                         animationDelay: `${index * 65}ms`,
                       }}
@@ -645,7 +910,7 @@ export default function Dashboard() {
 
                       <div className="relative mt-5 flex-1">
 
-                        <h4 className="text-lg font-bold tracking-tight text-slate-800 special_heading">
+                        <h4 className="special_heading text-lg font-bold tracking-tight text-slate-800">
                           {tool.title}
                         </h4>
 
@@ -682,7 +947,6 @@ export default function Dashboard() {
 
         </div>
 
-
         {/* FOOTER */}
 
         <footer className="mt-10 flex flex-col gap-2 border-t border-slate-200/80 pt-5 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
@@ -697,7 +961,7 @@ export default function Dashboard() {
 
       </div>
 
-      {/* ANIMATIONS */}
+      {/* DASHBOARD ANIMATIONS */}
 
       <style>{`
         @keyframes fadeInUp {
